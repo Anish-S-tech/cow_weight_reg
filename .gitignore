@@ -1,0 +1,57 @@
+# --- Secrets / environment ---
+.env
+.env.*.local
+*.pem
+*.key
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+
+# --- Node / frontend (future phases) ---
+node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/coverage/
+*.tsbuildinfo
+
+# --- ML data & training artifacts (never auto-downloaded, never committed) ---
+ml/datasets/
+ml/outputs/
+*.zip
+*.tar.gz
+
+# Curated, intentionally-committed model artifacts live under ml/artifacts/ and
+# are NOT excluded by the rule above (only ml/outputs/ scratch runs are).
+
+# Pretrained zero-shot detector checkpoints (downloaded on demand, not committed)
+*.pt
+!ml/artifacts/**/*.pt
+
+# --- Docker / DB volumes (future phases) ---
+docker/postgres/data/
+docker/redis/data/
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# --- Claude Code local config ---
+.claude/settings.local.json
