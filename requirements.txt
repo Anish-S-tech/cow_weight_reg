@@ -1,0 +1,11 @@
+# Inference server + test scripts
+flask
+numpy
+opencv-python
+pandas
+tensorflow
+ultralytics
+
+# Kaggle training automation (training/)
+nbformat
+requests

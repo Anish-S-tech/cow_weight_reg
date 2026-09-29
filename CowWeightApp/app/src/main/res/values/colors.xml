@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary_green">#2E7D32</color>
+    <color name="primary_green_dark">#1B5E20</color>
+    <color name="amber">#C08A10</color>
+    <color name="background">#F5F6F2</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="text_hint">#8A8F87</color>
+    <color name="divider">#E3E5DF</color>
+    <color name="warning_bg">#FDF3E7</color>
+    <color name="warning_border">#D98324</color>
+    <color name="warning_text">#7A4A0E</color>
+</resources>

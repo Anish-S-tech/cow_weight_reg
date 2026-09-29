@@ -1,5 +1,15 @@
-* text=auto eol=lf
+* text=auto
+*.sh text eol=lf
+gradlew text eol=lf
+*.bat text eol=crlf
+*.ipynb text eol=lf
 *.png binary
 *.jpg binary
+*.jpeg binary
+*.avif binary
+*.jks binary
 *.pt binary
-*.ipynb text eol=lf
+*.onnx binary
+*.tflite binary
+*.keras binary
+*.docx binary

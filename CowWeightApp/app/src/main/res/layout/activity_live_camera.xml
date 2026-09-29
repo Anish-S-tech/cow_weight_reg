@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <!-- Full-screen camera preview -->
+    <androidx.camera.view.PreviewView
+        android:id="@+id/previewView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:implementationMode="performance"
+        app:scaleType="fillCenter"/>
+
+    <!-- Corner-bracket scan guide -->
+    <FrameLayout
+        android:layout_width="260dp"
+        android:layout_height="320dp"
+        android:layout_gravity="center">
+
+        <View android:layout_width="24dp" android:layout_height="3dp"
+            android:layout_gravity="top|start" android:background="#CCFFFFFF"/>
+        <View android:layout_width="3dp" android:layout_height="24dp"
+            android:layout_gravity="top|start" android:background="#CCFFFFFF"/>
+
+        <View android:layout_width="24dp" android:layout_height="3dp"
+            android:layout_gravity="top|end" android:background="#CCFFFFFF"/>
+        <View android:layout_width="3dp" android:layout_height="24dp"
+            android:layout_gravity="top|end" android:background="#CCFFFFFF"/>
+
+        <View android:layout_width="24dp" android:layout_height="3dp"
+            android:layout_gravity="bottom|start" android:background="#CCFFFFFF"/>
+        <View android:layout_width="3dp" android:layout_height="24dp"
+            android:layout_gravity="bottom|start" android:background="#CCFFFFFF"/>
+
+        <View android:layout_width="24dp" android:layout_height="3dp"
+            android:layout_gravity="bottom|end" android:background="#CCFFFFFF"/>
+        <View android:layout_width="3dp" android:layout_height="24dp"
+            android:layout_gravity="bottom|end" android:background="#CCFFFFFF"/>
+
+    </FrameLayout>
+
+    <!-- TOP BAR -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:background="#BB000000"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingTop="40dp"
+        android:paddingBottom="10dp"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp">
+
+        <Button
+            android:id="@+id/btnClose"
+            style="@style/Widget.AppCompat.Button"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="#44FFFFFF"
+            android:text="✕"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:padding="0dp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Live Weigh"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#CCCC2020"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:text="● LIVE"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.08"/>
+
+    </LinearLayout>
+
+    <!-- BOTTOM PANEL -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="#DD000000"
+        android:orientation="vertical"
+        android:paddingTop="18dp"
+        android:paddingBottom="32dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp">
+
+        <!-- Status text -->
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Point camera at a cow"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="14dp"/>
+
+        <!-- Capture button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCapture"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Capture &amp; Weigh"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:backgroundTint="@color/primary_green"
+            app:cornerRadius="14dp"/>
+
+        <!-- Result card -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardResult"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:visibility="gone"
+            app:cardBackgroundColor="#1E1E1E"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="6dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="16dp"
+                android:paddingBottom="14dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="ESTIMATED WEIGHT"
+                    android:textColor="#777777"
+                    android:textSize="10sp"
+                    android:letterSpacing="0.12"/>
+
+                <TextView
+                    android:id="@+id/tvLiveWeight"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textColor="#C08A10"
+                    android:textSize="60sp"
+                    android:textStyle="bold"
+                    android:fontFeatureSettings="tnum"
+                    android:includeFontPadding="false"/>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Scan Again button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnScanAgain"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="10dp"
+            android:text="Scan Another Cow"
+            android:textColor="#FFFFFF"
+            app:strokeColor="#80FFFFFF"
+            app:cornerRadius="12dp"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
+</FrameLayout>

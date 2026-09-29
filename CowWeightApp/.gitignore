@@ -1,0 +1,9 @@
+.gradle/
+build/
+local.properties
+.idea/
+*.iml
+# Release signing — never commit; back these up somewhere safe
+keystore.properties
+*.jks
+*.keystore

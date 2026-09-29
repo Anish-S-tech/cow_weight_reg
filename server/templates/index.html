@@ -1,0 +1,612 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#5B7E3D">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>CowScale — Cattle Weight Estimator</title>
+<style>
+/* ── Tokens ─────────────────────────────────────────────────────────────── */
+:root {
+  --bg:          #FAFAF8;
+  --surface:     #EEEEE8;
+  --surface-2:   #E4E4DC;
+  --text:        #1A1C18;
+  --text-muted:  #666960;
+  --accent:      #5B7E3D;
+  --accent-fg:   #FFFFFF;
+  --amber:       #B07818;
+  --border:      #D4D4CC;
+  --error-bg:    #FDF0EE;
+  --error-text:  #9B2A1A;
+  --error-border:#E8C4BE;
+  --warn-bg:     #FDF5E8;
+  --warn-text:   #8B5A10;
+  --warn-border: #E8D4A8;
+  --shadow:      0 2px 12px rgba(26,28,24,.08);
+  --radius:      14px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:          #141614;
+    --surface:     #1E2018;
+    --surface-2:   #262820;
+    --text:        #E8EAE0;
+    --text-muted:  #8A8C84;
+    --accent:      #6E9A4A;
+    --accent-fg:   #FFFFFF;
+    --amber:       #C8921C;
+    --border:      #2E3028;
+    --error-bg:    #2A1810;
+    --error-text:  #F09080;
+    --error-border:#5A2820;
+    --warn-bg:     #261E08;
+    --warn-text:   #D4A850;
+    --warn-border: #4A3810;
+    --shadow:      0 2px 12px rgba(0,0,0,.32);
+  }
+}
+
+:root[data-theme="light"] {
+  --bg: #FAFAF8; --surface: #EEEEE8; --surface-2: #E4E4DC;
+  --text: #1A1C18; --text-muted: #666960; --accent: #5B7E3D;
+  --amber: #B07818; --border: #D4D4CC;
+  --error-bg: #FDF0EE; --error-text: #9B2A1A; --error-border: #E8C4BE;
+  --warn-bg: #FDF5E8; --warn-text: #8B5A10; --warn-border: #E8D4A8;
+  --shadow: 0 2px 12px rgba(26,28,24,.08);
+}
+
+:root[data-theme="dark"] {
+  --bg: #141614; --surface: #1E2018; --surface-2: #262820;
+  --text: #E8EAE0; --text-muted: #8A8C84; --accent: #6E9A4A;
+  --amber: #C8921C; --border: #2E3028;
+  --error-bg: #2A1810; --error-text: #F09080; --error-border: #5A2820;
+  --warn-bg: #261E08; --warn-text: #D4A850; --warn-border: #4A3810;
+  --shadow: 0 2px 12px rgba(0,0,0,.32);
+}
+
+/* ── Reset ──────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  width: 34px;
+  height: 34px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-icon svg { display: block; }
+
+.logo-name {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: var(--text);
+}
+
+.logo-name span {
+  color: var(--accent);
+}
+
+.theme-toggle {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: background .15s;
+}
+.theme-toggle:hover { background: var(--surface-2); }
+
+/* ── Main ───────────────────────────────────────────────────────────────── */
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 24px 20px;
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ── Upload zone ────────────────────────────────────────────────────────── */
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-zone:hover,
+.upload-zone.drag-over {
+  border-color: var(--accent);
+  background: var(--surface-2);
+}
+
+.upload-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+.upload-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+}
+
+.upload-label {
+  text-align: center;
+}
+
+.upload-label strong {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.upload-label span {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ── Preview ────────────────────────────────────────────────────────────── */
+.preview-wrap {
+  display: none;
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.preview-wrap.visible { display: block; }
+
+.preview-wrap img {
+  width: 100%;
+  display: block;
+  max-height: 320px;
+  object-fit: cover;
+}
+
+.preview-clear {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(20,22,20,.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* ── Predict button ─────────────────────────────────────────────────────── */
+.btn-predict {
+  display: none;
+  width: 100%;
+  padding: 16px;
+  background: var(--accent);
+  color: var(--accent-fg);
+  border: none;
+  border-radius: var(--radius);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+  cursor: pointer;
+  margin-top: 16px;
+  transition: opacity .2s, transform .1s;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-predict.visible { display: flex; }
+.btn-predict:active { transform: scale(.98); }
+.btn-predict:disabled { opacity: .55; cursor: not-allowed; }
+
+/* ── Loading ────────────────────────────────────────────────────────────── */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid rgba(255,255,255,.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  display: none;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation: none; opacity: .6; }
+}
+
+/* ── Alert messages ─────────────────────────────────────────────────────── */
+.alert {
+  display: none;
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-top: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.alert.visible { display: flex; }
+
+.alert-error {
+  background: var(--error-bg);
+  color: var(--error-text);
+  border: 1px solid var(--error-border);
+}
+
+.alert-warn {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+  border: 1px solid var(--warn-border);
+}
+
+.alert-icon { flex-shrink: 0; font-size: 16px; margin-top: 1px; }
+.alert-msg  { font-weight: 500; }
+
+/* ── Result card ────────────────────────────────────────────────────────── */
+.result-card {
+  display: none;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-top: 16px;
+  box-shadow: var(--shadow);
+}
+
+.result-card.visible { display: block; }
+
+.result-header {
+  padding: 14px 18px 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.result-header-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.result-conf {
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 600;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+.result-weight-wrap {
+  padding: 20px 18px 4px;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.result-weight {
+  font-size: 72px;
+  font-weight: 800;
+  letter-spacing: -3px;
+  color: var(--amber);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.result-unit {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: -0.5px;
+}
+
+.result-range {
+  padding: 6px 18px 20px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.result-range strong {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Footer ─────────────────────────────────────────────────────────────── */
+footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 12px;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+}
+</style>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M3 14c0-3.5 2-6 7-6s7 2.5 7 6" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="7" cy="6" r="2" fill="#fff" fill-opacity=".8"/>
+        <circle cx="13" cy="6" r="2" fill="#fff" fill-opacity=".8"/>
+        <path d="M9 8.5v1.5M11 8.5v1.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/>
+        <rect x="8" y="14" width="4" height="3" rx="1" fill="#fff" fill-opacity=".6"/>
+      </svg>
+    </div>
+    <span class="logo-name">Cow<span>Scale</span></span>
+  </div>
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+    <svg id="iconSun" width="18" height="18" viewBox="0 0 20 20" fill="none" display="none">
+      <circle cx="10" cy="10" r="4" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+    <svg id="iconMoon" width="18" height="18" viewBox="0 0 20 20" fill="none">
+      <path d="M17 10.5A7 7 0 1 1 9.5 3a5.5 5.5 0 0 0 7.5 7.5z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  </button>
+</header>
+
+<main>
+  <!-- Upload zone (hidden when preview is shown) -->
+  <div class="upload-zone" id="uploadZone">
+    <input type="file" accept="image/*" capture="environment" id="fileInput">
+    <div class="upload-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="12" cy="13" r="4" stroke="currentColor" stroke-width="1.7"/>
+      </svg>
+    </div>
+    <div class="upload-label">
+      <strong>Take or upload a photo</strong>
+      <span>One cow, full body, clear background</span>
+    </div>
+  </div>
+
+  <!-- Image preview -->
+  <div class="preview-wrap" id="previewWrap">
+    <img id="previewImg" src="" alt="Selected cow photo">
+    <button class="preview-clear" id="clearBtn" aria-label="Remove image">✕</button>
+  </div>
+
+  <!-- Predict button -->
+  <button class="btn-predict" id="predictBtn">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+      <path d="M3 6h18M3 12h18M3 18h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <span id="btnText">Estimate Weight</span>
+    <div class="spinner" id="spinner"></div>
+  </button>
+
+  <!-- Alert: error / warning -->
+  <div class="alert alert-error" id="alertError">
+    <span class="alert-icon">✕</span>
+    <span class="alert-msg" id="alertErrorMsg"></span>
+  </div>
+  <div class="alert alert-warn" id="alertWarn">
+    <span class="alert-icon">⚠</span>
+    <span class="alert-msg" id="alertWarnMsg"></span>
+  </div>
+
+  <!-- Result -->
+  <div class="result-card" id="resultCard">
+    <div class="result-header">
+      <span class="result-header-label">Estimated Weight</span>
+      <span class="result-conf" id="resultConf"></span>
+    </div>
+    <div class="result-weight-wrap">
+      <span class="result-weight" id="resultWeight">—</span>
+      <span class="result-unit">kg</span>
+    </div>
+    <div class="result-range" id="resultRange"></div>
+  </div>
+</main>
+
+<footer>CowScale &mdash; For estimation purposes only</footer>
+
+<script>
+const fileInput   = document.getElementById('fileInput');
+const uploadZone  = document.getElementById('uploadZone');
+const previewWrap = document.getElementById('previewWrap');
+const previewImg  = document.getElementById('previewImg');
+const clearBtn    = document.getElementById('clearBtn');
+const predictBtn  = document.getElementById('predictBtn');
+const btnText     = document.getElementById('btnText');
+const spinner     = document.getElementById('spinner');
+const alertError  = document.getElementById('alertError');
+const alertErrorMsg = document.getElementById('alertErrorMsg');
+const alertWarn   = document.getElementById('alertWarn');
+const alertWarnMsg = document.getElementById('alertWarnMsg');
+const resultCard  = document.getElementById('resultCard');
+const resultWeight = document.getElementById('resultWeight');
+const resultConf  = document.getElementById('resultConf');
+const resultRange = document.getElementById('resultRange');
+
+let selectedFile = null;
+
+function showPreview(file) {
+  selectedFile = file;
+  const url = URL.createObjectURL(file);
+  previewImg.src = url;
+  uploadZone.style.display = 'none';
+  previewWrap.classList.add('visible');
+  predictBtn.classList.add('visible');
+  hideAll();
+}
+
+function resetAll() {
+  selectedFile = null;
+  previewImg.src = '';
+  uploadZone.style.display = '';
+  previewWrap.classList.remove('visible');
+  predictBtn.classList.remove('visible');
+  fileInput.value = '';
+  hideAll();
+}
+
+function hideAll() {
+  alertError.classList.remove('visible');
+  alertWarn.classList.remove('visible');
+  resultCard.classList.remove('visible');
+}
+
+function showError(msg) {
+  hideAll();
+  alertErrorMsg.textContent = msg;
+  alertError.classList.add('visible');
+}
+
+function showWarn(msg) {
+  hideAll();
+  alertWarnMsg.textContent = msg;
+  alertWarn.classList.add('visible');
+}
+
+function setLoading(loading) {
+  predictBtn.disabled = loading;
+  btnText.textContent = loading ? 'Analysing...' : 'Estimate Weight';
+  spinner.style.display = loading ? 'block' : 'none';
+}
+
+fileInput.addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (file) showPreview(file);
+});
+
+clearBtn.addEventListener('click', resetAll);
+
+predictBtn.addEventListener('click', async () => {
+  if (!selectedFile) return;
+  setLoading(true);
+  hideAll();
+
+  const form = new FormData();
+  form.append('image', selectedFile);
+
+  try {
+    const res  = await fetch('/predict', { method: 'POST', body: form });
+    const data = await res.json();
+
+    if (data.error) {
+      const isWarn = data.error.toLowerCase().includes('multiple');
+      isWarn ? showWarn(data.error) : showError(data.error);
+    } else {
+      resultWeight.textContent = data.weight_kg.toFixed(1);
+      resultConf.textContent   = `${Math.round(data.confidence * 100)}% confident`;
+      resultRange.innerHTML    = `Likely range &nbsp;<strong>${data.range_low} – ${data.range_high} kg</strong>`;
+      resultCard.classList.add('visible');
+    }
+  } catch (err) {
+    showError('Connection error. Make sure the server is running.');
+  } finally {
+    setLoading(false);
+  }
+});
+
+// Drag and drop
+uploadZone.addEventListener('dragover', e => {
+  e.preventDefault();
+  uploadZone.classList.add('drag-over');
+});
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) showPreview(file);
+});
+
+// Theme toggle
+const toggle = document.getElementById('themeToggle');
+const iconSun  = document.getElementById('iconSun');
+const iconMoon = document.getElementById('iconMoon');
+let darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+  iconSun.style.display  = darkMode ? 'block' : 'none';
+  iconMoon.style.display = darkMode ? 'none'  : 'block';
+}
+
+applyTheme();
+toggle.addEventListener('click', () => { darkMode = !darkMode; applyTheme(); });
+</script>

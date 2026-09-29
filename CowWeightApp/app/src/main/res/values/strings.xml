@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CowWeightApp</string>
+    <string name="app_title">Cow Weight</string>
+    <string name="tagline">AI CATTLE WEIGHT ESTIMATION</string>
+    <string name="btn_live_camera">Live Camera</string>
+    <string name="hint_live">Point your camera at a cow for a real-time estimate</string>
+    <string name="divider_photo">OR USE A GALLERY PHOTO</string>
+    <string name="hint_no_image">Choose a photo from your gallery</string>
+    <string name="btn_gallery">Choose from Gallery</string>
+    <string name="btn_analyze">Analyze Weight</string>
+    <string name="label_weight">ESTIMATED WEIGHT</string>
+    <string name="result_tip">Estimate only — for reference, not veterinary use</string>
+</resources>

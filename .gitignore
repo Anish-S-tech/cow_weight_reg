@@ -3,6 +3,7 @@
 .env.*.local
 *.pem
 *.key
+kaggle.json
 
 # --- Python ---
 __pycache__/
@@ -21,34 +22,39 @@ dist/
 .coverage.*
 htmlcov/
 .tox/
+.ipynb_checkpoints/
 
-# --- Node / frontend (future phases) ---
-node_modules/
-frontend/dist/
-frontend/.vite/
-frontend/coverage/
-*.tsbuildinfo
+# --- Run logs / Kaggle outputs ---
+auto_runner_logs/
+kaggle_outputs/
+*.log
 
-# --- ML data & training artifacts (never auto-downloaded, never committed) ---
-ml/datasets/
-ml/outputs/
-*.zip
-*.tar.gz
+# --- Build outputs / release binaries (APK is >100 MB; share via GitHub Releases) ---
+*.apk
+*.aab
 
-# Curated, intentionally-committed model artifacts live under ml/artifacts/ and
-# are NOT excluded by the rule above (only ml/outputs/ scratch runs are).
-
-# Pretrained zero-shot detector checkpoints (downloaded on demand, not committed)
+# --- Model weights ---
+# Pretrained YOLO checkpoints are auto-downloaded by ultralytics.
 *.pt
-!ml/artifacts/**/*.pt
+# Exported YOLO files at repo root (the app's copy lives in CowWeightApp/app/src/main/assets/)
+/*.onnx
+/*.tflite
+yolov8n_saved_model/
 
-# --- Docker / DB volumes (future phases) ---
-docker/postgres/data/
-docker/redis/data/
+# --- Local test images, documents and reports (keep them out of the repo) ---
+*.jpg
+*.jpeg
+*.png
+*.avif
+*.webp
+*.pdf
+*.docx
+batch_results.csv
 
 # --- OS / editor ---
 .DS_Store
 Thumbs.db
+desktop.ini
 .idea/
 .vscode/*
 !.vscode/extensions.json
